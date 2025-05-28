@@ -1,0 +1,14 @@
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+*.tfvars
+*.tfplan
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Keys or other sensitive files
+word-reverser-key.pem
