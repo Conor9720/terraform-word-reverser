@@ -8,82 +8,29 @@ yum install -y python3 nginx git
 systemctl enable nginx
 systemctl start nginx
 
-# Install FastAPI and Uvicorn
+# Install FastAPI, Uvicorn, and any requirements
 pip3 install fastapi uvicorn
 
-# Set up the backend FastAPI app
-mkdir -p /home/ec2-user/word-reverser
-cat <<EOF > /home/ec2-user/word-reverser/app.py
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+# Clean up any previous clone
+rm -rf /home/ec2-user/word-reverser
 
-app = FastAPI()
+# Clone your GitHub repo
+cd /home/ec2-user
+git clone https://github.com/Conor9720/terraform-word-reverser.git word-reverser
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Optional: Install dependencies if you have a requirements.txt
+cd /home/ec2-user/word-reverser
+if [ -f requirements.txt ]; then
+    pip3 install -r requirements.txt
+fi
 
-class Word(BaseModel):
-    word: str
+# Run the FastAPI app with uvicorn in the background on port 8000
+nohup uvicorn app:app --host 0.0.0.0 --port 8000 &
 
-@app.get("/")
-def read_root():
-    return {"message": "OK"}
-
-@app.post("/reverse")
-def reverse_word(data: Word):
-    return {"reversed_word": data.word[::-1]}
-EOF
-
-# Run the app with uvicorn in the background on port 8000
-nohup uvicorn /home/ec2-user/word-reverser/app:app --host 0.0.0.0 --port 8000 &
-
-# Create the frontend HTML
-cat <<EOF > /usr/share/nginx/html/index.html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Reverser</title>
-</head>
-<body>
-    <h1>Word Reverser</h1>
-    <form id="wordForm">
-        <label for="word">Enter a word:</label>
-        <input type="text" id="word" name="word">
-        <button type="submit">Reverse</button>
-    </form>
-
-    <p id="reversedWord"></p>
-
-    <script>
-        const form = document.getElementById('wordForm');
-    
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-    
-            const word = document.getElementById('word').value;
-    
-            const response = await fetch('/reverse', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ word })
-            });
-    
-            const data = await response.json();
-            document.getElementById('reversedWord').textContent = \`Reversed Word: \${data.reversed_word}\`;
-        });
-    </script>   
-</body>
-</html>
-EOF
+# Replace the default nginx HTML with your frontend (if included)
+if [ -f /home/ec2-user/word-reverser/index.html ]; then
+    cp /home/ec2-user/word-reverser/index.html /usr/share/nginx/html/index.html
+fi
 
 # Configure Nginx to reverse proxy to FastAPI
 cat <<EOF > /etc/nginx/conf.d/word-reverser.conf
@@ -103,5 +50,5 @@ server {
 }
 EOF
 
-# Restart nginx to apply config
+# Restart nginx to apply new config
 systemctl restart nginx
