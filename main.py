@@ -1,11 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello from FastAPI!"}
+class Word(BaseModel):
+    text: str
 
-@app.get("/reverse")
-def reverse_word(word: str):
-    return {"reversed": word[::-1]}
+@app.get("/")
+def health_check():
+    return {"status": "ok"}
+
+@app.post("/reverse")
+def reverse_word(word: Word):
+    return {"reversed": word.text[::-1]}
