@@ -25,7 +25,8 @@ if [ -f requirements.txt ]; then
 fi
 
 # Run the FastAPI app with uvicorn in the background on port 8000
-nohup uvicorn app:app --host 0.0.0.0 --port 8000 &
+nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+
 
 # Replace the default nginx HTML with your frontend (if included)
 if [ -f /home/ec2-user/word-reverser/index.html ]; then
