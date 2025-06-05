@@ -1,7 +1,5 @@
 #!/bin/bash
-
-# Exit script on any error
-set -e
+set -euo pipefail
 
 # Update and install necessary packages
 yum update -y
@@ -12,15 +10,33 @@ systemctl enable nginx
 systemctl start nginx
 
 # Clean up any previous clone
-rm -rf /home/ec2-user/word-reverser
-
-# Clone public repo
 cd /home/ec2-user
-git clone https://github.com/Conor9720/terraform-word-reverser.git word-reverser
+rm -rf word-reverser
+
+# Retry loop for cloning the repo (handles timing/network issues)
+REPO_URL="https://github.com/Conor9720/terraform-word-reverser.git"
+CLONE_DIR="word-reverser"
+
+for i in {1..5}; do
+    echo "Attempting to clone repo (try $i)..."
+    if git clone "$REPO_URL" "$CLONE_DIR"; then
+        echo "✅ Clone successful."
+        break
+    else
+        echo "⚠️ Clone failed. Retrying in 5 seconds..."
+        sleep 5
+    fi
+done
+
+# Exit early if clone still failed
+if [ ! -d "$CLONE_DIR" ]; then
+    echo "❌ ERROR: Failed to clone repo after multiple attempts."
+    exit 1
+fi
 
 # Install dependencies
 cd /home/ec2-user/word-reverser
-pip3 install fastapi uvicorn
+pip3 install fastapi uvicorn --break-system-packages
 if [ -f requirements.txt ]; then
     pip3 install -r requirements.txt
 fi
