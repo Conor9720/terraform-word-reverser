@@ -36,8 +36,8 @@ resource "aws_security_group" "ec2_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 80
-    to_port         = 80
+    from_port       = 8000
+    to_port         = 8000
     protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
   }
@@ -78,7 +78,7 @@ resource "aws_instance" "web" {
 # TARGET GROUP
 resource "aws_lb_target_group" "tg" {
   name     = "word-reverser-tg"
-  port     = 80
+  port     = 8000
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   target_type = "instance"
@@ -98,7 +98,7 @@ resource "aws_lb_target_group_attachment" "ec2_attach" {
   count            = 2
   target_group_arn = aws_lb_target_group.tg.arn
   target_id        = aws_instance.web[count.index].id
-  port             = 80
+  port             = 8000
 }
 
 # LOAD BALANCER
