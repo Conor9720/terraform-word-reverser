@@ -5,7 +5,11 @@ set -xe
 
 echo "✅ Running setup.sh..."
 
-set -euo pipefail
+# Wait for yum lock to clear
+while sudo fuser /var/run/yum.pid >/dev/null 2>&1; do
+  echo "⏳ Waiting for yum lock..."
+  sleep 5
+done
 
 # Update and install necessary packages
 yum update -y
