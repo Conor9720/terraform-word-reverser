@@ -1,4 +1,10 @@
 #!/bin/bash
+
+exec > /var/log/user-data.log 2>&1
+set -xe
+
+echo "✅ Running setup.sh..."
+
 set -euo pipefail
 
 # Update and install necessary packages
