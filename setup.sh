@@ -48,7 +48,7 @@ fi
 
 # Install dependencies
 cd /home/ec2-user/word-reverser
-pip3 install fastapi uvicorn --break-system-packages
+pip3 install fastapi uvicorn
 if [ -f requirements.txt ]; then
     pip3 install -r requirements.txt
 fi
