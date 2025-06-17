@@ -68,7 +68,8 @@ resource "aws_instance" "web" {
 
   associate_public_ip_address = true
 
-  user_data = file("setup.sh")
+  user_data = base64encode(file("setup.sh"))
+  user_data_replace_on_change = true
   
   tags = {
     Name = "WordReverser-${count.index}"
