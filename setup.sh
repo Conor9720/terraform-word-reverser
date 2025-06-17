@@ -1,5 +1,4 @@
 #!/bin/bash
-
 exec > /var/log/user-data.log 2>&1
 set -xe
 
@@ -13,7 +12,10 @@ done
 
 # Update and install necessary packages
 yum update -y
-yum install -y python3 nginx git
+yum install -y python3 git
+
+# Install nginx via Amazon Linux Extras
+amazon-linux-extras install -y nginx1
 
 # Enable and start nginx
 systemctl enable nginx
