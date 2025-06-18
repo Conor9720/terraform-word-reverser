@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Word Reverser</title>
+</head>
+<body>
+    <h1>Enter a word to reverse</h1>
+    <form method="post">
+        <input type="text" name="word" required>
+        <button type="submit">Reverse</button>
+    </form>
+
+    {% if reversed %}
+        <h2>Reversed word: {{ reversed }}</h2>
+    {% endif %}
+</body>
+</html>
