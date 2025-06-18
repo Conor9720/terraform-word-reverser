@@ -1,46 +1,17 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
-class Word(BaseModel):
-    text: str
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
-def homepage():
-    return """
-    <html>
-        <head>
-            <title>Word Reverser</title>
-        </head>
-        <body>
-            <h1>Reverse a Word</h1>
-            <form id="reverse-form">
-                <input type="text" id="word-input" placeholder="Enter a word" required>
-                <button type="submit">Reverse</button>
-            </form>
-            <p id="result"></p>
-            <script>
-                const form = document.getElementById('reverse-form');
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const word = document.getElementById('word-input').value;
-                    const response = await fetch('/reverse', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ text: word })
-                    });
-                    const data = await response.json();
-                    document.getElementById('result').innerText = 'Reversed: ' + data.reversed;
-                });
-            </script>
-        </body>
-    </html>
-    """
+def read_form(request: Request):
+    return templates.TemplateResponse("form.html", {"request": request, "reversed": None})
 
-@app.post("/reverse")
-def reverse_word(word: Word):
-    return {"reversed": word.text[::-1]}
+@app.post("/", response_class=HTMLResponse)
+def reverse_word(request: Request, word: str = Form(...)):
+    reversed_word = word[::-1]
+    return templates.TemplateResponse("form.html", {"request": request, "reversed": reversed_word})
+
