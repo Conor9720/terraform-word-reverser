@@ -1,16 +1,6 @@
-variable "vpc_id" {
-  description = "The ID of the VPC"
-  type        = string
-}
-
 variable "my_ip" {
   description = "Personal IP address for SSH access"
   type        = string
-}
-
-variable "subnet_ids" {
-  description = "List of public subnet IDs"
-  type        = list(string)
 }
 
 variable "ami_id" {
