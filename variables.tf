@@ -32,3 +32,13 @@ variable "certificate_arn" {
   description = "The ARN of the ACM certificate"
   type        = string
 }
+
+variable "route53_zone_id" {
+  description = "The Route 53 hosted zone ID for the domain"
+  type        = string
+}
+
+variable "domain_name" {
+  description = "The domain name to associate with the load balancer"
+  type        = string
+}
