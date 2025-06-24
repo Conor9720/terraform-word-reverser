@@ -62,7 +62,7 @@ resource "aws_instance" "web" {
   count         = 2
   ami           = var.ami_id
   instance_type = var.instance_type
-  subnet_id     = element(var.subnet_ids, count.index)
+  subnet_id     = element([aws_subnet.public_a.id, aws_subnet.public_b.id], count.index)
   key_name      = "word-reverser-key"
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
